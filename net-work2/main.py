@@ -17,14 +17,15 @@ import torch.nn.functional as F
 
 class Net(nn.Module):
     def __init__(self):
-        super().__init__()
-        self.ln_1 = nn.Linear(28 * 28, 50)
-        self.Relu_1 = nn.ReLU()
-        self.fc1_drop = nn.Dropout(0.2)
-        self.ln_2 = nn.Linear(50, 50)
-        self.Relu_2 = nn.ReLU()
-        self.fc2_drop = nn.Dropout(0.2)
-        self.ln_3 = nn.Linear(50, 10)
+        super(Net, self).__init__()
+        self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
+        self.relu1 = nn.ReLU()
+        self.cnov2 = nn.Conv2d(10, 20, kernel_size=5)
+        self.conv2_drop = nn.Dropout2d()
+        self.relu2 = nn.ReLU()
+        self.fc1 = nn.Linear(320, 50)
+        self.relu3 = nn.ReLU()
+        self.fc2 = nn.Linear(50, 10)
 
     def forward(self, x):
         """
@@ -33,15 +34,18 @@ class Net(nn.Module):
         :return: 映射到的十个类别
         """
         # x = x.view(-1, 28 * 28)
-        x = self.ln_1(x)
-        x = self.Relu_1(x)
-        x = self.fc1_drop(x)
-        x = self.ln_2(x)
-        x = self.Relu_2(x)
-        x = self.fc2_drop(x)
-        x = self.ln_3(x)
-        return F.log_softmax(x, dim=1)
-
+        x = self.conv1(x)
+        x = F.max_pool2d(x, 2)
+        x = self.relu1(x)
+        x = self.cnov2(x)
+        x = self.conv2_drop(x)
+        x = F.max_pool2d(x, 2)
+        x = self.relu2(x)
+        x = x.view(-1, 320)
+        x = self.fc1(x)
+        x = self.relu3(x)
+        x = self.fc2(x)
+        return F.log_softmax(x)
 
 def load_mnist(file_dir, is_img):
     bin_file = open(file_dir, 'rb')
@@ -52,7 +56,7 @@ def load_mnist(file_dir, is_img):
         magic, num_images, num_rows, num_cols = struct.unpack_from(fmt_head, bin_data, 0)
         data_size = num_images * num_rows * num_cols
         mat_data = struct.unpack_from(">" + str(data_size) + 'B', bin_data, struct.calcsize(fmt_head))
-        mat_data = np.reshape(mat_data, [num_images, num_rows * num_cols])
+        mat_data = np.reshape(mat_data, [num_images, 1, num_rows, num_cols])
     else:
         fmt_head = '>ii'
         magic, num_images = struct.unpack_from(fmt_head, bin_data, 0)
@@ -135,8 +139,8 @@ def evaluation(loss_vector, accuracy_vector):
 
 if __name__ == "__main__":
     train_set, test_set = load_data("./data")
-    train_loader = torch.utils.data.DataLoader(train_set, shuffle=True, batch_size=32)
-    test_loader = torch.utils.data.DataLoader(train_set, shuffle=True, batch_size=32)
+    train_loader = torch.utils.data.DataLoader(train_set, shuffle=True, batch_size=64)
+    test_loader = torch.utils.data.DataLoader(train_set, shuffle=True, batch_size=64)
     model = Net()
     model.to('cpu')
     optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
@@ -151,7 +155,7 @@ if __name__ == "__main__":
             plt.imshow(X_train[i, :].numpy().reshape(28, 28), cmap="gray_r")
             plt.title('Class: ' + str(Y_train[i].item()))
             break
-    plt.show()
+    # plt.show()
 
     epochs = 10
 
