@@ -113,7 +113,7 @@ if __name__ == "__main__":
             plt.title('Class: ' + str(Y_train[i].item()))
             break
 
-    # 调用网络
+    # 调用网络           
     model = Net().to('cpu')  # 创建网络
     optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.5)  # 优化器, lr是学习率，momentum动量
     criterion = nn.CrossEntropyLoss()  # 定义评价标准，交叉商函数
