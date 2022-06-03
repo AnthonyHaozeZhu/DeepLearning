@@ -27,11 +27,11 @@ def cifar100_dataset(args):
         [transforms.ToTensor(),
          transforms.Normalize(mean, std)])
 
-    cifar100_training = torchvision.datasets.CIFAR100(root=args.data_path, train=True, download=True, transform=transform_train)
-    train_loader = torch.utils.data.DataLoader(cifar100_training, batch_size=args.batch_size, shuffle=True, num_workers=num_workers)
+    cifar10_training = torchvision.datasets.CIFAR10(root=args.data_path, train=True, download=True, transform=transform_train)
+    train_loader = torch.utils.data.DataLoader(cifar10_training, batch_size=args.batch_size, shuffle=True, num_workers=num_workers)
 
-    cifar100_testing = torchvision.datasets.CIFAR100(root=args.data_path, train=False, download=True, transform=transform_test)
-    test_loader = torch.utils.data.DataLoader(cifar100_testing, batch_size=100, shuffle=False, num_workers=num_workers)
+    cifar10_testing = torchvision.datasets.CIFAR10(root=args.data_path, train=False, download=True, transform=transform_test)
+    test_loader = torch.utils.data.DataLoader(cifar10_testing, batch_size=100, shuffle=False, num_workers=num_workers)
 
-    return train_loader, test_loader, cifar100_training.classes
+    return train_loader, test_loader, cifar10_training.classes
 

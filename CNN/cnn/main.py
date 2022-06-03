@@ -8,6 +8,7 @@
 
 import argparse
 from tqdm import tqdm
+from torch.utils.tensorboard import SummaryWriter
 
 from data import *
 from utils import *
@@ -31,27 +32,32 @@ def train(args, epoch):
 
         # print statistics
         running_loss += loss.item()
+        writer1.add_scalar("loss/train", running_loss, (epoch+1)*index)
         if index % 20 == 19:    # print every 2000 mini-batches
             logger.info(f'[{epoch + 1}, {index + 1:5d}] loss: {running_loss / 2000:.3f}')
             running_loss = 0.0
 
 
-def validate(args, loss_vector, accuracy_vector):
+def validate(args, epoch, loss_vector, accuracy_vector):
     net.eval()
     val_loss, correct = 0, 0
-    for _, (data, target) in enumerate(test_loader):
+    for index, (data, target) in enumerate(test_loader):
         data = data.to(args.device)
         target = target.to(args.device)
         output = net(data)
         val_loss += criterion(output, target.to(args.device)).data.item()
+
         pred = output.data.max(1)[1]  # get the index of the max log-probability
         correct += pred.eq(target.data).cpu().sum()
 
     val_loss /= len(test_loader)
     loss_vector.append(val_loss)
+    writer2.add_scalar("loss/validation", val_loss, (epoch+1))
 
     accuracy = 100. * correct.to(torch.float32) / len(test_loader.dataset)
     accuracy_vector.append(accuracy)
+    writer2.add_scalar("accuracy/validation", accuracy, (epoch+1))
+
     logger.info("***** Eval results *****")
     logger.info('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         val_loss, correct, len(test_loader.dataset), accuracy))
@@ -66,7 +72,7 @@ def main(args, loss_vector, accuracy_vector):
         train(args, epoch)
         PATH = os.path.join(args.logdir, 'cifar_net.pth')
         torch.save(net.state_dict(), PATH)
-        validate(args, loss_vector, accuracy_vector)
+        validate(args, epoch, loss_vector, accuracy_vector)
 
 
 if __name__ == "__main__":
@@ -86,6 +92,10 @@ if __name__ == "__main__":
     # images, labels = dataiter.next()
     #
     # imshow(torchvision.utils.make_grid(images))
+
+    writer1 = SummaryWriter(args.logdir)
+    writer2 = SummaryWriter(args.logdir)
+    writer3 = SummaryWriter(args.logdir)
 
     net = ResNet().to(args.device)
 

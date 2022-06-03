@@ -6,3 +6,4 @@
 *.gz
 data
 *.zip
+.pth
