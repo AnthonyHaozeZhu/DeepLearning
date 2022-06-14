@@ -97,6 +97,3 @@ def randomTrainingExample():
     line_tensor = lineToTensor(line)
     return category, line, category_tensor, line_tensor
 
-# print(letterToTensor('J'))
-
-# print(lineToTensor('Jones').size())

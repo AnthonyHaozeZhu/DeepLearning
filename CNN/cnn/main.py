@@ -12,11 +12,12 @@ from torch.utils.tensorboard import SummaryWriter
 
 from data import *
 from utils import *
-from ResNet import *
+from Net import *
 
 
 def train(args, epoch):
     # running_loss = 0.0
+    net.train()
     train_tqdm = tqdm(train_loader, desc="Epoch " + str(epoch))
     for index, (inputs, labels) in enumerate(train_tqdm):
         # print(inputs.shape, labels.shape)
@@ -88,7 +89,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", default=0.0004, type=int, help="learning rate")
     parser.add_argument("--epochs", default=20, type=int, help="Training epoch")
     parser.add_argument("--logdir", default="./log", type=str)
-    parser.add_argument("--model", default="Resnet", type=str, help="Resnet Base Densenet")
+    parser.add_argument("--model", default="Densenet", type=str, help="Resnet Base Densenet")
 
     args = parser.parse_args()
 
@@ -106,6 +107,8 @@ if __name__ == "__main__":
         net = ResNet().to(args.device)
     if args.model == "Base":
         net = Net().to(args.device)
+    if args.model == "Densenet":
+        net = DenseNet().to(args.device)
     else:
         print("没有该模型，error")
         exit()

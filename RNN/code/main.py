@@ -9,9 +9,9 @@
 from data import *
 from model import *
 from utils import *
+
 import argparse
 import time
-
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -53,12 +53,19 @@ def main(args, current_loss):
             current_loss = 0
 
 
+# Just return an output given a line
+def evaluate(line_tensor):
+    hidden = rnn.initHidden()
+    for i in range(line_tensor.size()[0]):
+        output, hidden = rnn(line_tensor[i], hidden)
+    return output
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_path", default="./data", type=str, help="The input data dir")
     parser.add_argument("--batch_size", default=4, type=int, help="The batch size of training")
     parser.add_argument("--device", default='cpu', type=str, help="The training device")
-    parser.add_argument("--learning_rate", default=0.0004, type=int, help="learning rate")
+    parser.add_argument("--learning_rate", default=0.005, type=int, help="learning rate")
     parser.add_argument("--epochs", default=20, type=int, help="Training epoch")
     parser.add_argument("--logdir", default="./log", type=str)
     parser.add_argument("--hidden", default=128, type=int, help="The number of hidden state")
@@ -88,15 +95,6 @@ if __name__ == '__main__':
 
     confusion = torch.zeros(n_categories, n_categories)
     n_confusion = 10000
-
-    # Just return an output given a line
-    def evaluate(line_tensor):
-        hidden = rnn.initHidden()
-
-        for i in range(line_tensor.size()[0]):
-            output, hidden = rnn(line_tensor[i], hidden)
-
-        return output
 
     # Go through a bunch of examples and record which are correctly guessed
     for i in range(n_confusion):

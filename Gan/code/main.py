@@ -16,24 +16,21 @@ import torchvision.transforms as transforms
 
 
 def train(args):
-    for epoch in range(args.epochs):
+    for epoch in range(args.epochs):  # 3 epochs
         for i, data in enumerate(dataloader, 0):
             # STEP 1: Discriminator optimization step
-            # print(data)
-            # x_real, _ = iter(dataloader).next()
-            # print(data)
-            x_real = data[0]
+            x_real, _ = next(iter(dataloader))
             x_real = x_real.to(args.device)
             # reset accumulated gradients from previous iteration
             optimizerD.zero_grad()
 
             D_x = D(x_real)
-            lossD_real = criterion(D_x, lab_real)
+            lossD_real = criterion(D_x, lab_real.to(args.device))
 
-            z = torch.randn(64, 100, device=args.device)  # random noise, 64 samples, z_dim=100
+            z = torch.randn(args.batch_size, 100, device=args.device)  # random noise, 64 samples, z_dim=100
             x_gen = G(z).detach()
             D_G_z = D(x_gen)
-            lossD_fake = criterion(D_G_z, lab_fake)
+            lossD_fake = criterion(D_G_z, lab_fake.to(args.device))
 
             lossD = lossD_real + lossD_fake
             lossD.backward()
@@ -43,7 +40,7 @@ def train(args):
             # reset accumulated gradients from previous iteration
             optimizerG.zero_grad()
 
-            z = torch.randn(64, 100, device=args.device)  # random noise, 64 samples, z_dim=100
+            z = torch.randn(args.batch_size, 100, device=args.device)  # random noise, 64 samples, z_dim=100
             x_gen = G(z)
             D_G_z = D(x_gen)
             lossG = criterion(D_G_z, lab_real)  # -log D(G(z))
@@ -56,7 +53,6 @@ def train(args):
                 fig.canvas.draw()
                 print('e{}.i{}/{} last mb D(x)={:.4f} D(G(z))={:.4f}'.format(
                     epoch, i, len(dataloader), D_x.mean().item(), D_G_z.mean().item()))
-
         # End of epoch
         x_gen = G(fixed_noise)
         collect_x_gen.append(x_gen.detach().clone())
@@ -66,10 +62,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path", default="./FashionMNIST/", type=str, help="The input data dir")
     parser.add_argument("--batch_size", default=64, type=int, help="The batch size of training")
-    parser.add_argument("--device", default='cpu', type=str, help="The training device")
-    parser.add_argument("--learning_rate", default=0.003, type=int, help="learning rate")
-    parser.add_argument("--epochs", default=20, type=int, help="Training epoch")
-    parser.add_argument("--logdir", default="./log", type=str)
+    parser.add_argument("--device", default='mps', type=str, help="The training device")
+    parser.add_argument("--learning_rate", default=0.01, type=int, help="learning rate")
+    parser.add_argument("--epochs", default=10, type=int, help="Training epoch")
 
     args = parser.parse_args()
 
@@ -86,11 +81,11 @@ if __name__ == "__main__":
 
     criterion = nn.BCELoss()
 
-    lab_real = torch.ones(64, 1, device=args.device)
-    lab_fake = torch.zeros(64, 1, device=args.device)
+    lab_real = torch.ones(args.batch_size, 1, device=args.device)
+    lab_fake = torch.zeros(args.batch_size, 1, device=args.device)
 
     collect_x_gen = []
-    fixed_noise = torch.randn(64, 100, device=args.device)
+    fixed_noise = torch.randn(args.batch_size, 100, device=args.device)
     fig = plt.figure()  # keep updating this one
     plt.ion()
 
