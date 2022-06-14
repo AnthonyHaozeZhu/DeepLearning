@@ -88,6 +88,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", default=0.0004, type=int, help="learning rate")
     parser.add_argument("--epochs", default=20, type=int, help="Training epoch")
     parser.add_argument("--logdir", default="./log", type=str)
+    parser.add_argument("--model", default="Resnet", type=str, help="Resnet Base Densenet")
 
     args = parser.parse_args()
 
@@ -101,8 +102,13 @@ if __name__ == "__main__":
     writer = SummaryWriter(os.path.join(args.logdir, "tensorboard"))
     # writer2 = SummaryWriter(args.logdir)
     # writer3 = SummaryWriter(args.logdir)
-
-    net = ResNet().to(args.device)
+    if args.model == "Resnet":
+        net = ResNet().to(args.device)
+    if args.model == "Base":
+        net = Net().to(args.device)
+    else:
+        print("没有该模型，error")
+        exit()
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr=args.learning_rate)
