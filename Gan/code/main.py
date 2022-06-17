@@ -62,7 +62,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path", default="./FashionMNIST/", type=str, help="The input data dir")
     parser.add_argument("--batch_size", default=64, type=int, help="The batch size of training")
-    parser.add_argument("--device", default='mps', type=str, help="The training device")
+    parser.add_argument("--device", default='cpu', type=str, help="The training device")
     parser.add_argument("--learning_rate", default=0.01, type=int, help="learning rate")
     parser.add_argument("--epochs", default=10, type=int, help="Training epoch")
 

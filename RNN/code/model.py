@@ -31,3 +31,20 @@ class RNN(nn.Module):
     def initHidden(self):
         return torch.zeros(1, self.hidden_size)
 
+
+class LSTM(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(LSTM, self).__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers=2)
+        self.linear = nn.Linear(hidden_size, output_size)
+        self.softmax = nn.LogSoftmax(dim=1)
+        # print(input_size)
+
+    def forward(self, x):
+        out, (h_n, c_n) = self.lstm(x)
+        # print(x.shape)
+        # print(c_n.shape, h_n.shape, x.shape)
+        out = (self.linear(out[-1]))
+        # print(x[-1].shape)
+        out = self.softmax(out)
+        return out
