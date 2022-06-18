@@ -1,0 +1,4 @@
+06/13/2022 23:40:50 - INFO - utils -   ***** Running training *****
+06/13/2022 23:40:50 - INFO - utils -     Num examples = 50000
+06/13/2022 23:40:50 - INFO - utils -     Num Epochs = 20
+06/13/2022 23:40:50 - INFO - utils -     Batch size = 4

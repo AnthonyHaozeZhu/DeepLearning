@@ -1,0 +1,12 @@
+06/14/2022 21:18:17 - INFO - utils -   ***** Running training *****
+06/14/2022 21:18:17 - INFO - utils -     Num examples = 50048
+06/14/2022 21:18:17 - INFO - utils -     Num Epochs = 20
+06/14/2022 21:18:17 - INFO - utils -     Batch size = 128
+06/14/2022 21:19:30 - INFO - utils -   ***** Eval results *****
+06/14/2022 21:19:30 - INFO - utils -   
+Validation set: Average loss: 1.2490, Accuracy: 5509/10000 (55%)
+
+06/14/2022 21:20:41 - INFO - utils -   ***** Eval results *****
+06/14/2022 21:20:41 - INFO - utils -   
+Validation set: Average loss: 1.0737, Accuracy: 6196/10000 (62%)
+
